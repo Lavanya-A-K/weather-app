@@ -162,7 +162,7 @@ const Weather = () => {
             const geocodeData = await geocodeResponse.json();
             if (geocodeData.length > 0) {
               const districtOrState =
-              geocodeData[0].name || geocodeData[0].state || "Unknown";
+              geocodeData[0].state || geocodeData[0].name || "Unknown";
               setCity(districtOrState);
               handleSearch(districtOrState);
             } else {

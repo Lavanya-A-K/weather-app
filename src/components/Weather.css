@@ -161,11 +161,11 @@
     padding: 5px 5px 0 0;
   }
 }
-.forecast-item{
+.forecast-item {
   display: block;
   text-align: center;
   padding-right: 20px;
-  min-width: 150px;
+  min-width: 180px;
 }
 .forecast-item img {
   height: 60px;
@@ -184,15 +184,16 @@
     font-size: 12px;
    && .forecast-item {
       padding: 0 5px;
+      min-width: 120px;
     }
     && img {
     height: 40px;
   }
   }
 }
-@media screen and (min-width: 450px) and (max-width: 690px) {
+@media screen and (min-width: 450px) and (max-width: 720px) {
   .weather {
-    max-width: 430px;
+    max-width: 450px;
   }
   .search-bar input {
     max-width: 300px;
@@ -204,5 +205,10 @@
     && img {
       height: 50px;
     }
+  }
+}
+@media screen and (min-width: 720px) and (max-width: 1060px) {
+  .weather {
+    max-width: 750px;
   }
 }
