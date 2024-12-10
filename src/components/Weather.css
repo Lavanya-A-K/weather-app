@@ -107,6 +107,18 @@
   width: 150px;
   margin: 15px 0;
 }
+.rotate-icon {
+  animation: rotate 10s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
 .temperature {
   color: #fff;
   font-size: 40px;
