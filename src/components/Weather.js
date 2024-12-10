@@ -4,13 +4,14 @@ import searchIcon from "../assets/SearchIcon.svg"
 import cloudIcon from "../assets/cloud.png"
 import humidityIcon from "../assets/humidity.svg"
 import windIcon from "../assets/wind.svg"
-import clearSky from "../assets/normalDay.gif"
-import clearSkyNight from "../assets/clearNight.gif"
-import cloudyIcon from "../assets/cloudy.png"
+import HazeDay from "../assets/cloudyDay.gif"
+import HazeNight from "../assets/cloudyNight.gif"
+import clearMoon from "../assets/clearMoon.png"
+import clearSun from "../assets/clearSun.png"
 import cloudyNightIcon from "../assets/cloudyNight.gif"
 import cloudyDayIcon from "../assets/cloudyDay.gif"
 import rainIcon from "../assets/rainy.gif"
-import heavyRainIcon from "../assets/thunderstorm.gif"
+import clearSky from "../assets/normalDay.gif"
 import snow from "../assets/snow.gif"
 import scatteredClouds from "../assets/scatteredClouds.gif"
 
@@ -22,8 +23,8 @@ const Weather = () => {
   const [inputValue, setInputValue] = useState("");
 
   const weatherIcons = {
-    "01d" : clearSky,
-    "01n" : clearSkyNight,
+    "01d" : clearSun,
+    "01n" : clearMoon,
     "02d" : cloudyDayIcon,
     "02n" : cloudyNightIcon,
     "03d" : cloudyDayIcon,
@@ -36,6 +37,8 @@ const Weather = () => {
     "10n" : rainIcon,
     "13d" : snow,
     "13n" : snow,
+    "50d" : HazeDay,
+    "50n" : HazeNight,
   }
 
   const API_KEY = process.env.REACT_APP_WEATHER_ID;
@@ -89,8 +92,6 @@ const Weather = () => {
           });
         }
       });
-  console.log("today",todayForecast)
-  console.log("daily",dailyForecast)
       return {dailyForecast, todayForecast};
     } catch (error) {
       console.error("Error fetching forecast data:", error);
@@ -162,7 +163,7 @@ const Weather = () => {
             const geocodeData = await geocodeResponse.json();
             if (geocodeData.length > 0) {
               const districtOrState =
-              geocodeData[0].name || geocodeData[0].state || "Unknown";
+              geocodeData[0].state || geocodeData[0].name || "Unknown";
               setCity(districtOrState);
               handleSearch(districtOrState);
             } else {
@@ -182,21 +183,21 @@ const Weather = () => {
     }
   };
   return (
-      <div className="weather">
-        <div className="search-bar">
-          <input type="text" placeholder="Search location" value={inputValue || city}
-            onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
-          />
-          <div className='search-icon' onClick={handleSearchClick}><img src={searchIcon} alt=""/></div>
-        </div>
-        {weatherData ? (
-          <>
-            <img src={weatherData.icon} alt="" className="weather-icon"/>
-            <span>{weatherData.description}</span>
-            <p className="temperature">{weatherData.temperature}° C</p>
-            <p className="location">{weatherData.location} {weatherData.state ? `, ${weatherData.state}` : ""}</p>
-            <p>Feels like {weatherData.feelsLike}° C</p>
+    <div className="weather">
+      <div className="search-bar">
+        <input type="text" placeholder="Search location" value={inputValue || city}
+          onChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+        />
+        <div className='search-icon' onClick={handleSearchClick}><img src={searchIcon} alt=""/></div>
+      </div>
+      {weatherData ? (
+        <>
+          <img src={weatherData.icon} alt="" className={(weatherData.icon === clearSun || weatherData.icon === clearMoon) ? "rotate-icon weather-icon" : "weather-icon"}/>
+          <span>{weatherData.description}</span>
+          <p className="temperature">{weatherData.temperature}° C</p>
+          <p className="location">{weatherData.location} {weatherData.state ? `, ${weatherData.state}` : ""}</p>
+          <p>Feels like {weatherData.feelsLike}° C</p>
           <div className="weather-data">
             <div>
               <p><img className="icon-svg" src={humidityIcon} alt=""/> Humidity : {weatherData.humidity}%</p>
@@ -215,66 +216,51 @@ const Weather = () => {
           </div>
           {forecast && (
             <div className="forcast-data">
-              <h2>Today's Forecast</h2>
-              <div className="today-forecast">
-                {forecast.todayForecast.map((item) => (
-                  <div key={item.dt} className="forecast-item">
-                    <p>{item.time}</p>
-                    <img
-                      src={`https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`}
-                      alt={item.weather[0].description}
-                    />
-                    <p>{item.main.temp.toFixed(1)}°C</p>
-                    <p>
-                      <img className="humidity-icon" src={humidityIcon} alt=""/>{item.main.humidity}%
-                    </p>
-                    <p>{item.weather[0].description}</p>
-                  </div>
-                ))}
-              </div>
-              
+              {forecast?.todayForecast && (
+              <>
+                <h2>Today's Forecast</h2>
+                <div className="today-forecast">
+                  {forecast?.todayForecast?.map((item) => (
+                    <div key={item.dt} className="forecast-item">
+                      <p>{item.time}</p>
+                      <img
+                        src={`https://openweathermap.org/img/wn/${item.weather[0]?.icon}@2x.png`}
+                        alt={item?.weather[0]?.description}
+                      />
+                      <p>{item?.main?.temp?.toFixed(1)}°C</p>
+                      <p>
+                        <img className="humidity-icon" src={humidityIcon} alt=""/>{item?.main?.humidity}%
+                      </p>
+                      <p>{item?.weather[0]?.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </>
+              )}
               <h2>Weekly Forecast</h2>
               <div className="daily-forecast">
-                {forecast.dailyForecast.map((item) => {
-                  const date = new Date(item.dt * 1000);
-                  const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
+                {forecast?.dailyForecast?.map((item) => {
+                  const date = new Date(item?.dt * 1000);
+                  const dayName = date?.toLocaleDateString("en-US", { weekday: "long" });
                   return (
-                    <div key={item.dt} className="forecast-item">
+                    <div key={item?.dt} className="forecast-item">
                       <p>{dayName}</p>
                       <img
-                        src={`https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`}
-                        alt={item.weather[0].description}
+                        src={`https://openweathermap.org/img/wn/${item?.weather[0]?.icon}@2x.png`}
+                        alt={item?.weather[0]?.description}
                       />
-                      <p>{item.main.temp.toFixed(1)}°C</p>
+                      <p>{item?.main?.temp?.toFixed(1)}°C</p>
                       <p>
-                        <img className="humidity-icon" src={humidityIcon} alt=""/>{item.main.humidity}%
+                        <img className="humidity-icon" src={humidityIcon} alt=""/>{item?.main?.humidity}%
                       </p>
-                      <p>{item.weather[0].description}</p>
+                      <p>{item?.weather[0]?.description}</p>
                     </div>
                   );
                 })}
               </div>
-            {/* {forecast?.dailyForecast?.map((item) => {
-              const date = new Date(item.dt * 1000);
-              const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
-              return (
-                <div key={item.dt} className="forecast-item">
-                  <p>{dayName}</p>
-                  //<p>{item.time}</p> 
-                  <img
-                    src={`https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`}
-                    alt={item.weather[0].description}
-                  />
-                  <p>{item.main.temp.toFixed(1)}°C</p>
-                  <p>{item.main.humidity}%</p>
-                  <p>{item.weather[0].description}</p>
-                </div>
-              );
-            })} */}
-            
             </div>
-        )}
-      </> 
+          )}
+        </> 
       ) : (
         <p>Loading...</p>
       )}
