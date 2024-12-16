@@ -14,6 +14,7 @@ import rainIcon from "../assets/rainy.gif"
 import clearSky from "../assets/normalDay.gif"
 import snow from "../assets/snow.gif"
 import scatteredClouds from "../assets/scatteredClouds.gif"
+import PopupAlert from "./PopupAlert/PopupAlert";
 
 const Weather = () => {
   const [weatherData, setWeatherData] = useState(false);
@@ -21,6 +22,8 @@ const Weather = () => {
   const [forecast, setForecast] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(new Date());
   const [inputValue, setInputValue] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
 
   const weatherIcons = {
     "01d" : clearSun,
@@ -55,6 +58,10 @@ const Weather = () => {
       handleSearch(city);
     }
   },[])
+
+  const onClose = () => {
+    setShowPopup (false)
+  }
 
   const getWeatherForecast = async (city) => {
     try {
@@ -102,7 +109,8 @@ const Weather = () => {
     if (city.trim() !== "") {
       handleSearch(city);
     } else {
-      alert("Please enter a city name.");
+      setPopupMessage("Please enter a city name.");
+      setShowPopup(true);
     }
   };
   const handleSearch = async (city)=>{
@@ -112,7 +120,8 @@ const Weather = () => {
         );
         const data = await response.json();
         if(!response.ok){
-          alert(data.message);
+          setPopupMessage(data.message || "An unexpected error occurred.");
+          setShowPopup(true)
           return;
         }
         const icon = weatherIcons[data.weather[0].icon] || clearSky
@@ -130,6 +139,8 @@ const Weather = () => {
         })
         setLastUpdated(new Date());
       } catch(error) {
+        setPopupMessage("Network error. Please try again.");
+        setShowPopup(true);
         console.log (error);
       }
     }
@@ -145,7 +156,8 @@ const Weather = () => {
       if (inputValue.trim() !== "") {
         handleSearch(inputValue);
       } else {
-        alert("Please enter a city name.");
+        setPopupMessage("Please enter a city name.")
+        setShowPopup(true)
       }
     }
   };
@@ -264,6 +276,7 @@ const Weather = () => {
       ) : (
         <p>Loading...</p>
       )}
+      {showPopup && (<PopupAlert message={popupMessage} onClose={onClose} />)}
     </div>
   )
 }
